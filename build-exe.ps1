@@ -4,22 +4,27 @@
     using the built-in Windows .NET Framework 4.x C# compiler (no SDK download required!).
 #>
 $ErrorActionPreference = 'Stop'
-$root = Split-Path -Parent $MyInvocation.MyCommand.Path
-$csc  = 'C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe'
+$root   = Split-Path -Parent $MyInvocation.MyCommand.Path
+$winDir = if ($env:WINDIR) { $env:WINDIR } else { [Environment]::GetFolderPath('Windows') }
 
-if (-not (Test-Path $csc)) {
-    throw "Built-in .NET 4.x C# compiler not found at $csc"
+$csc = @(
+    (Join-Path $winDir 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'),
+    (Join-Path $winDir 'Microsoft.NET\Framework\v4.0.30319\csc.exe')
+) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+
+if (-not $csc) {
+    throw "Built-in .NET 4.x C# compiler (csc.exe) was not found under $winDir\Microsoft.NET."
 }
 
 $distDir = Join-Path $root 'dist'
-if (-not (Test-Path $distDir)) { New-Item -ItemType Directory -Path $distDir -Force | Out-Null }
+if (-not (Test-Path -LiteralPath $distDir)) { New-Item -ItemType Directory -Path $distDir -Force | Out-Null }
 
 $outExe   = Join-Path $distDir 'GameLoop-Doctor.exe'
 $srcCs    = Join-Path $root 'src\Launcher.cs'
 $manifest = Join-Path $root 'src\app.manifest'
 $psScript = Join-Path $root 'GameLoop-Doctor.ps1'
 
-Write-Host "Building standalone $outExe ..." -ForegroundColor Cyan
+Write-Host "Building standalone $outExe using $csc ..." -ForegroundColor Cyan
 & $csc `
     /nologo `
     /target:winexe `

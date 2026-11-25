@@ -1,8 +1,11 @@
 # GameLoop Doctor
 
-**All-in-one Windows Desktop App & PowerShell tool** to remove buggy **GameLoop 7.0 ("Androws" / TenStore Android Connect)**, restore **Classic GameLoop (`TxGameAssistant`)** with sharp **Ultra HD 2K**, **permanently block forced 7.0 silent auto-updates**, and fix common lag/stutter bottlenecks on Windows 10 & 11.
+**All-in-one, detect-first Windows Desktop App & PowerShell tool** to remove buggy **GameLoop 7.0 ("Androws" / TenStore Android Connect)**, restore **Classic GameLoop (`TxGameAssistant`)** with sharp **Ultra HD 2K**, **permanently block forced 7.0 emulator upgrades while keeping game downloads & game updates working**, and fix common lag/stutter bottlenecks on any Windows 10 or 11 PC.
 
-> **100% Anti-Cheat Safe:** GameLoop Doctor only manages Windows host files, Firewall rules, NTFS folder permissions, and Windows GPU/DPI settings. It **never** touches PUBG Mobile internal files (`UserCustom.ini`, `Active.sav`, `data.vhd`) or game memory.
+> **100% Anti-Cheat Safe & Detect-First:**
+> - GameLoop Doctor only manages Windows host files, NTFS folder permissions, optional Firewall rules, and Windows GPU/DPI settings. It **never** touches internal game files (`UserCustom.ini`, `Active.sav`, `data.vhd`) or game memory.
+> - **Never applies blind tweaks:** Automatically discovers your fixed NTFS drives, custom or standard GameLoop install paths (via Registry + Services + Drives), GPU vendor (NVIDIA / AMD / Intel discrete vs. integrated), Windows DPI scaling, and active antivirus before showing a preview of only the changes needed on *your* PC.
+> - **Games Stay 100% Online:** Surgically blocks the GameLoop 7.0 emulator self-upgrade **without** blocking `AppMarket.exe` in the firewall, so downloading and updating PUBG Mobile, Call of Duty Mobile, Free Fire, and other games continues working automatically inside Classic GameLoop!
 
 ---
 
@@ -10,15 +13,15 @@
 
 If Classic GameLoop (`TxGameAssistant`) silently upgraded your PC to **GameLoop 7.0 ("Androws")**, you probably hit:
 - **Blurry ~720p graphics** on *Smooth / Super Smooth* (GameLoop 7.0 removed Classic GameLoop's `Gaming Resolution: Ultra HD 2K` engine hook).
-- **Random mouse camera freezes & missed keys** (GameLoop 7.0's Hyper-V HCS input pipe + `Raw="1"` `0 ms` same-finger resets + 1000 Hz gaming mice).
-- **Mid-game lag spikes** (Hyper-V HCS contending with Docker/WSL2, Windows 11 Memory Integrity / HVCI, dual-GPU compositing, and Defender scanning `data.vhd`).
-- **Repeated forced upgrades:** Even after reinstalling Classic GameLoop, `AppMarket.exe` silently drops `com_tencent_gameloop_silent_update_up_client_*.exe` and `com_tencent_gameloop_yybinstaller_*.exe` into `Temp\TxGameDownload\MobileGamePCShared\` and force-installs 7.0 again (hopping to another drive if one folder is blocked!).
+- **Random mouse camera freezes & missed keys** (GameLoop 7.0's Hyper-V HCS input pipe + raw touch resets + high polling-rate gaming mice).
+- **Mid-game lag spikes** (Hyper-V contending with VMs/containers, Windows Memory Integrity / HVCI, dual-GPU compositing, DPI scaling, and real-time antivirus scanning of emulator virtual disks).
+- **Repeated forced upgrades:** Even after reinstalling Classic GameLoop, bundled updaters (`AndrowsInstaller.exe`, `pcyyb_installer.exe`, `PcyybAssistant.exe`, `tupdate.exe`) and silently downloaded `com_tencent_gameloop_*.exe` installers force-install 7.0 again — even hopping to another drive if only one folder is blocked.
 
 ---
 
 ## Quick Start (3 Ways to Run — Zero Dependencies!)
 
-Works out of the box on **Windows 10 & Windows 11** (no Python, Node, or .NET SDK install required):
+Works out of the box on **any Windows 10 or Windows 11 PC** (no Python, Node, or .NET SDK install required):
 
 ### Option 1 — One-Line PowerShell Command (Fastest!)
 Open **PowerShell** (or **Windows Terminal**) and run:
@@ -27,74 +30,68 @@ irm https://raw.githubusercontent.com/<YOUR_GITHUB_USERNAME>/gameloop-doctor/mai
 ```
 *(Replace `<YOUR_GITHUB_USERNAME>` with your GitHub username after pushing.)*
 
-### Option 2 — Double-Click Desktop App (From Cloned Repo / ZIP)
-1. Download or clone this repository.
-2. Double-click **`Launch-GameLoop-Doctor.bat`** (or run `dist\GameLoop-Doctor.exe` if you download a release).
-3. Accept the standard Windows Administrator (UAC) prompt — the dark native desktop window opens immediately.
+### Option 2 — Double-Click Desktop App (From Cloned Repo / Release)
+1. Download or clone this repository (or grab `GameLoop-Doctor.exe` from GitHub Releases).
+2. Double-click **`Launch-GameLoop-Doctor.bat`** (or `GameLoop-Doctor.exe`).
+3. Accept the standard Windows Administrator (UAC) prompt — the dark native desktop window opens and runs a read-only scan of your PC before changing anything.
 
-### Option 3 — Headless One-Click CLI Commands (Power Users)
+### Option 3 — Headless CLI Commands & `-DryRun` Preview (Power Users)
 ```powershell
-# Scan PC without changing anything (no Admin needed)
+# Scan your PC without changing anything (no Admin needed)
 .\GameLoop-Doctor.ps1 -Diagnose
 
-# Step 1: Completely remove GameLoop 7.0 ("Androws")
-.\GameLoop-Doctor.ps1 -RemoveGameLoop7
+# Preview what any action would change on THIS PC before applying (-DryRun)
+.\GameLoop-Doctor.ps1 -RemoveGameLoop7 -DryRun
+.\GameLoop-Doctor.ps1 -LockUpdates -DryRun
+.\GameLoop-Doctor.ps1 -OptimizeWindows -DryRun
 
-# Step 2: Lock out forced 7.0 auto-updates (run AFTER PUBG Mobile finishes installing!)
-.\GameLoop-Doctor.ps1 -LockUpdates
-
-# Temporarily allow GameLoop Store online to download/update PUBG Mobile (keeps NTFS 7.0 lock active!)
-.\GameLoop-Doctor.ps1 -AllowStore
-
-# Apply GPU pinning, High-DPI blur fix, Game DVR off, & Defender exclusions
-.\GameLoop-Doctor.ps1 -OptimizeWindows
-
-# Reverse all blocks cleanly
-.\GameLoop-Doctor.ps1 -UnblockAll
+# Apply actions
+.\GameLoop-Doctor.ps1 -RemoveGameLoop7    # Step 1: Detect & remove GameLoop 7.0
+.\GameLoop-Doctor.ps1 -LockUpdates        # Step 2: Block 7.0 emulator upgrade ONLY (keeps game downloads/updates online!)
+.\GameLoop-Doctor.ps1 -OptimizeWindows    # Apply hardware-appropriate GPU, DPI, DVR & Defender fixes
+.\GameLoop-Doctor.ps1 -StrictBlockStore   # Optional: also block AppMarket.exe outbound in Firewall
+.\GameLoop-Doctor.ps1 -AllowStore         # Re-allow AppMarket.exe outbound if Strict Mode was used
+.\GameLoop-Doctor.ps1 -UnblockAll         # Reverse all blocks cleanly
 ```
 
 ---
 
 ## Recommended Step-by-Step Workflow
 
-1. **Remove GameLoop 7.0:** Click **Remove GameLoop 7.0** — stops & deletes `GameLoopService`, takes ownership of locked `Program Files\Tencent\GameLoop` / `GameLoopData` folders across all drives, deletes cached `com_tencent_gameloop_*.exe` silent upgraders, and cleans 7.0 registry entries *(without deleting your Classic `GLP_installer*.exe` or cached classic packages)*.
-2. **Install Classic GameLoop & PUBG Mobile:** Click **Launch Classic Installer**, install Classic GameLoop (`TxGameAssistant`), and let **PUBG Mobile** finish downloading and open once.
-   - In Classic GameLoop **Settings → Game**, set **Gaming Resolution** to **Ultra HD 2K**.
-3. **Lock Out Forced 7.0 Updates Forever:** Click **Lock Out 7.0 Updates**. This applies a **4-layer shield**:
-   - **Layer 1 (NTFS Deny-Write Lockdown):** Creates empty write-denied `Program Files\Tencent\GameLoop` & `GameLoopData` placeholders on **every fixed drive (`C:`, `D:`, `E:`, `F:`, ...)** plus `%APPDATA%\Tencent\GameLoop` & `DeskUpdate`. Even if an updater runs as Administrator/SYSTEM, Windows NTFS rejects every write.
-   - **Layer 2 (Updater Cleanup):** Deletes `com_tencent_gameloop_*.exe` silent upgraders, disables classic `tupdate.exe` / `Update.exe`, and sets `AutoUpdate = 0`.
-   - **Layer 3 (Smart Firewall Block + Direct Shortcut):** Blocks `AppMarket.exe` outbound via Windows Defender Firewall while keeping **`AndroidEmulatorEn.exe` and PUBG Mobile 100% online**, and puts a **`PUBG Mobile (Classic Direct)`** shortcut on your Desktop (`AndroidEmulatorEn.exe -vm 100`).
-   - **Layer 4 (Smart Download Guard):** Automatically detects if `UI\AndroidEmulatorEn.exe` isn't installed yet (meaning PUBG is still downloading) and keeps `AppMarket.exe` open until your game finishes installing!
-4. **Optimize Windows for Zero Lag:** Click **Apply One-Click Performance Fixes** to pin the emulator to your discrete GPU (NVIDIA/AMD), fix 125%/150% DPI scaling blur (`HIGHDPIAWARE`), disable Fullscreen Optimizations & Xbox Game DVR, and add Windows Defender exclusions for `TxGameAssistant` & `Temp\TxGameDownload`.
-
----
-
-## How to Update PUBG Mobile Later (Without Getting Upgraded to 7.0)
-
-- **Small in-game updates & resource packs:** Work automatically inside PUBG Mobile — no action needed!
-- **Major PUBG Mobile APK updates (every ~2 months):**
-  1. Open **GameLoop Doctor** and click **Allow Store (Download/Update PUBG)** *(or run `.\GameLoop-Doctor.ps1 -AllowStore`)*.
-     - Your **NTFS write-lock on `Tencent\GameLoop` stays active**, so GameLoop 7.0 still cannot install while the store is open.
-  2. Open Classic GameLoop and update PUBG Mobile.
-  3. Click **Lock Out 7.0 Updates** again once PUBG opens.
+1. **Remove GameLoop 7.0:** Click **Remove GameLoop 7.0** — scans your PC via Services, Registry, and all fixed NTFS drives, shows every detected 7.0 component in a confirmation dialog, then removes `GameLoopService`, 7.0 folders, cached silent upgraders, and 7.0 registry entries *(without deleting your Classic `GLP_installer*.exe` or Classic GameLoop files)*.
+2. **Install Classic GameLoop & Your Games:** Click **Launch Classic Installer**, install Classic GameLoop (`TxGameAssistant`), and download your games (PUBG Mobile, Call of Duty Mobile, Free Fire, etc.).
+   - In Classic GameLoop **Settings → Game**, set **Gaming Resolution** to **Ultra HD 2K** (if supported by your monitor/GPU).
+3. **Block Forced 7.0 Emulator Upgrades (While Keeping Game Downloads & Updates Online!):** Click **Lock Out 7.0 Updates (Games Online)**. Shows a preview first, then applies a **surgical shield** that stops ONLY the emulator upgrade without touching game downloads:
+   - **Layer 1 (All-Drive NTFS Deny-Write Lockdown):** Automatically detects every fixed NTFS drive on your PC and creates empty write-denied `Program Files\Tencent\GameLoop` & `GameLoopData` placeholders plus `%APPDATA%\Tencent\GameLoop`, `%APPDATA%\Tencent\DeskUpdate`, and `%LOCALAPPDATA%\Tencent\GameLoop`. Even if an elevated 7.0 silent installer runs, Windows NTFS rejects every write and it exits immediately with zero impact on Classic GameLoop.
+   - **Layer 2 (Surgical Bundled & Silent Upgrader Neutralizer):**
+     - Disables Classic's bundled 7.0/emulator updater binaries (`AppMarket\AndrowsInstaller.exe`, `UI\pcyyb_installer.exe`, `AppMarket\PcyybAssistant.exe`, `AppMarket\GF186\tupdate.exe`, `AppMarket\Update.exe`, `UI\Update.exe`) — **without touching `AppMarket.exe`, `GameDownload.exe`, or game engines!**
+     - Neutralizes any cached `com_tencent_gameloop_*.exe` silent upgraders into 0-byte write+execute-denied stubs so they can't be re-downloaded or executed.
+     - Sets Classic `AutoUpdate = 0` and `EnableAutoUpdate = 0`.
+   - **Layer 3 (Direct Launcher Shortcut & Online Store):** Creates a **`GameLoop Classic (Direct Launch)`** shortcut on your Desktop (`AndroidEmulatorEn.exe -vm 100`) for one-click play, while keeping `AppMarket.exe` **100% online** so installing new games and major seasonal APK updates work automatically!
+   - *(Optional Strict Mode)* If you ever want to block `AppMarket.exe` outbound network traffic too, use **Optional: Strict Block Store** (protected by Smart Download Guard so it won't block before your emulator engine is installed).
+4. **Apply Detected Performance Fixes:** Click **Apply Detected Performance Fixes** — previews and applies *only* what your hardware actually needs:
+   - Pins detected GameLoop executables to your **discrete GPU** *(skipped automatically on integrated-only PCs)*.
+   - Applies **`HIGHDPIAWARE`** *(when Windows scaling is above 100%)* and disables Fullscreen Optimizations *(preserving any existing custom compatibility flags)*.
+   - Disables **Xbox Game DVR** *(only if currently enabled)*.
+   - Adds **Windows Defender** exclusions for detected GameLoop folders/processes *(only if Windows Defender is actively running and exclusions are missing)*.
 
 ---
 
 ## Extra Tips for Lag-Free Gameplay
 
-- **Quit Docker Desktop / WSL2** before gaming (another Hyper-V VM running alongside your emulator causes micro-stutters).
-- **Windows 11 Memory Integrity (HVCI):** Click **Open Core Isolation (HVCI)** in the app — turning Memory Integrity **OFF** (requires reboot) removes hypervisor overhead during emulator gameplay.
-- **High Polling-Rate Gaming Mice (1000 Hz+):** If you ever experience camera hitching in emulators on a 1000 Hz mouse (e.g., Logitech G HUB), lowering Report Rate to **250–500 Hz** drastically stabilizes virtual touch input.
+- **Close heavy VM/container tools** (Docker Desktop, WSL2, VMware, VirtualBox) before gaming to prevent hypervisor CPU contention.
+- **Windows Memory Integrity (HVCI):** Click **Open Core Isolation (HVCI)** in the app — turning Memory Integrity **OFF** (requires reboot) reduces virtualization overhead during emulator gameplay.
+- **High Polling-Rate Gaming Mice (1000 Hz+):** If you experience camera hitching in emulators on a 1000 Hz+ gaming mouse (Logitech, Razer, SteelSeries, Pulsar, etc.), lowering the mouse Report Rate to **250–500 Hz** significantly stabilizes virtual touch camera movement.
 
 ---
 
 ## Building the Standalone `.exe` Locally
 
-No .NET SDK or Visual Studio required — uses Windows' built-in .NET Framework 4.x compiler (`csc.exe`):
+No .NET SDK or Visual Studio required — compiles using Windows' built-in .NET Framework 4.x compiler (`csc.exe`):
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\build-exe.ps1
 ```
-Output: `dist\GameLoop-Doctor.exe` (single-file ~15 KB executable with `GameLoop-Doctor.ps1` embedded and UAC elevation manifest).
+Output: `dist\GameLoop-Doctor.exe` (single-file ~90 KB executable with `GameLoop-Doctor.ps1` embedded and UAC elevation manifest).
 
 ---
 
