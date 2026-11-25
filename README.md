@@ -26,9 +26,8 @@ Works out of the box on **any Windows 10 or Windows 11 PC** (no Python, Node, or
 ### Option 1 — One-Line PowerShell Command (Fastest!)
 Open **PowerShell** (or **Windows Terminal**) and run:
 ```powershell
-irm https://raw.githubusercontent.com/<YOUR_GITHUB_USERNAME>/gameloop-doctor/main/GameLoop-Doctor.ps1 -OutFile "$env:TEMP\GameLoop-Doctor.ps1"; powershell -ExecutionPolicy Bypass -File "$env:TEMP\GameLoop-Doctor.ps1"
+irm https://raw.githubusercontent.com/nicefellow1234/gameloop-doctor/main/GameLoop-Doctor.ps1 -OutFile "$env:TEMP\GameLoop-Doctor.ps1"; powershell -ExecutionPolicy Bypass -File "$env:TEMP\GameLoop-Doctor.ps1"
 ```
-*(Replace `<YOUR_GITHUB_USERNAME>` with your GitHub username after pushing.)*
 
 ### Option 2 — Double-Click Desktop App (From Cloned Repo / Release)
 1. Download or clone this repository (or grab `GameLoop-Doctor.exe` from GitHub Releases).
