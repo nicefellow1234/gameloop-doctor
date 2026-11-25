@@ -2276,6 +2276,12 @@ $RefreshUI = {
     }
     $TxtShieldSub.Text = "NTFS Locks: $($d.LockedFolders)/$($d.TotalLockTargets) | Active Updaters: $($d.ActiveUpdaters.Count + $d.CachedUpgraders.Count)`nStore: $($d.FirewallStatus)"
 
+    if ($d.Classic) {
+        $BtnLaunchClassic.Content = 'Launch Classic (Installed)'
+    } else {
+        $BtnLaunchClassic.Content = 'Install Classic GameLoop'
+    }
+
     if ($d.StoreFwBlocked) {
         $BtnToggleStrict.Content    = 'Re-Allow Store Downloads'
         $BtnToggleStrict.Background = & $Brush '#0284C7'
@@ -2456,10 +2462,20 @@ $DoRemove7 = {
 }
 
 $DoLaunchClassicInstaller = {
+    $existingClassic = Find-ClassicGameLoop
+    if ($existingClassic) {
+        $ans = [System.Windows.MessageBox]::Show(
+            "Classic GameLoop is ALREADY installed on this PC:`n$($existingClassic.Root)`n`nYou do NOT need to download or reinstall it!`n`nClick 'Yes' to launch your existing Classic GameLoop now (or 'No' to cancel).",
+            "Classic GameLoop Already Installed", 'YesNo', 'Information')
+        if ($ans -eq 'Yes') {
+            & $DoLaunchClassicApp
+        }
+        return
+    }
     $inst = Find-ClassicInstaller
     if ($inst) {
         $ans = [System.Windows.MessageBox]::Show(
-            "Found local GameLoop installer:`n$inst`n`nLaunch this installer now?",
+            "Found local Classic GameLoop installer:`n$inst`n`nLaunch this installer now?",
             "Launch Detected Installer", 'YesNo', 'Question')
         if ($ans -eq 'Yes') {
             & $WriteLog "Launching detected local installer: $inst"
@@ -2571,7 +2587,10 @@ $BtnEasyOpenHvci.Add_Click({
 
 # Advanced Mode Controls
 $BtnRemove7.Add_Click($DoRemove7)
-$BtnLaunchClassic.Add_Click($DoLaunchClassicInstaller)
+$BtnLaunchClassic.Add_Click({
+    if ($script:LastDiag -and $script:LastDiag.Classic) { & $DoLaunchClassicApp }
+    else { & $DoLaunchClassicInstaller }
+})
 $BtnLockUpdates.Add_Click($DoLockUpdates)
 $BtnOptimize.Add_Click($DoOptimizeWindows)
 
