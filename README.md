@@ -29,10 +29,12 @@ Open **PowerShell** (or **Windows Terminal**) and run:
 irm https://raw.githubusercontent.com/nicefellow1234/gameloop-doctor/main/GameLoop-Doctor.ps1 -OutFile "$env:TEMP\GameLoop-Doctor.ps1"; powershell -ExecutionPolicy Bypass -File "$env:TEMP\GameLoop-Doctor.ps1"
 ```
 
-### Option 2 — Double-Click Desktop App (From Cloned Repo / Release)
-1. Download or clone this repository (or grab `GameLoop-Doctor.exe` from GitHub Releases).
+### Option 2 — Double-Click Desktop App (Easy Mode & Advanced Mode)
+1. Download or clone this repository (or grab `GameLoop-Doctor.exe` from [GitHub Releases](https://github.com/nicefellow1234/gameloop-doctor/releases)).
 2. Double-click **`Launch-GameLoop-Doctor.bat`** (or `GameLoop-Doctor.exe`).
-3. Accept the standard Windows Administrator (UAC) prompt — the dark native desktop window opens and runs a read-only scan of your PC before changing anything.
+3. Accept the standard Windows Administrator (UAC) prompt — the dark native desktop window opens in **Easy Mode** by default:
+   - **Easy Mode (Default):** Clean, beginner-friendly dashboard focused primarily on **blocking forced GameLoop 7.0 beta auto-updates** (while keeping game downloads & PUBG updates 100% online), plus a clearly labeled **Optional Extra: PC Spec Auto-Optimizer** that reads your CPU, RAM, GPU/VRAM, and monitor to tailor Classic GameLoop settings for your hardware.
+   - **Advanced Mode:** Switch anytime from the top pill toggle for granular controls, **Preview Dry Run**, detailed hardware/NTFS telemetry, Optional Strict Store Firewall toggle, **Undo All Blocks**, and the live activity log.
 
 ### Option 3 — Headless CLI Commands & `-DryRun` Preview (Power Users)
 ```powershell
@@ -68,11 +70,9 @@ irm https://raw.githubusercontent.com/nicefellow1234/gameloop-doctor/main/GameLo
      - Sets Classic `AutoUpdate = 0` and `EnableAutoUpdate = 0`.
    - **Layer 3 (Direct Launcher Shortcut & Online Store):** Creates a **`GameLoop Classic (Direct Launch)`** shortcut on your Desktop (`AndroidEmulatorEn.exe -vm 100`) for one-click play, while keeping `AppMarket.exe` **100% online** so installing new games and major seasonal APK updates work automatically!
    - *(Optional Strict Mode)* If you ever want to block `AppMarket.exe` outbound network traffic too, use **Optional: Strict Block Store** (protected by Smart Download Guard so it won't block before your emulator engine is installed).
-4. **Apply Detected Performance Fixes:** Click **Apply Detected Performance Fixes** — previews and applies *only* what your hardware actually needs:
-   - Pins detected GameLoop executables to your **discrete GPU** *(skipped automatically on integrated-only PCs)*.
-   - Applies **`HIGHDPIAWARE`** *(when Windows scaling is above 100%)* and disables Fullscreen Optimizations *(preserving any existing custom compatibility flags)*.
-   - Disables **Xbox Game DVR** *(only if currently enabled)*.
-   - Adds **Windows Defender** exclusions for detected GameLoop folders/processes *(only if Windows Defender is actively running and exclusions are missing)*.
+4. **Optional Extra — Auto-Tune for Your PC Specs:** Click **Apply Optional Optimization** (completely separate from the primary update shield — never forced!). Reads your real hardware (CPU cores/threads, RAM, GPU + accurate 64-bit VRAM, monitor resolution & refresh rate, and Windows DPI scaling), classifies your PC (`Entry` / `Mid-Range` / `High-End` / `Ultra`), previews exact changes, and tailors:
+   - **Classic GameLoop Engine Preferences** (`VMCpuCount`, `VMMemorySizeInMB`, `VMResWidth`/`VMResHeight` capped to your monitor, `VMDPI`, Shader Cache, Render Optimization, VSync off, AA off, Dedicated GPU priority).
+   - **Windows Host Tweaks:** Discrete GPU pinning *(skipped automatically on integrated-only PCs)*, `HIGHDPIAWARE` *(when DPI scaling > 100%)*, Disable Fullscreen Optimizations, Xbox Game DVR off *(if enabled)*, and Windows Defender exclusions *(only if Defender is active)*.
 
 ---
 
@@ -90,7 +90,7 @@ No .NET SDK or Visual Studio required — compiles using Windows' built-in .NET 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\build-exe.ps1
 ```
-Output: `dist\GameLoop-Doctor.exe` (single-file ~90 KB executable with `GameLoop-Doctor.ps1` embedded and UAC elevation manifest).
+Output: `dist\GameLoop-Doctor.exe` (single-file ~140 KB executable with `GameLoop-Doctor.ps1` embedded and UAC elevation manifest).
 
 ---
 
